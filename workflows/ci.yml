@@ -1,0 +1,59 @@
+# CeloHT — CI + On-Chain Treasury Reconciliation Pack  
+Platform Edition — Not a Token
+
+CeloHT is a **platform**, not a token.  
+It uses **cUSD** for treasury operations and **CELO** for gas fees.  
+This document supports the 3 Core Pillars: **Education • Agents • Reforestation**.
+
+---
+
+# 1. CI/CD Configuration (GitHub Actions)
+
+Create file:  
+`.github/workflows/ci.yml`
+
+```yaml
+name: celoht-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Node + Foundry + Slither
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install JS dependencies
+        run: npm install
+
+      - name: Run JS tests
+        run: npm run test
+
+      - name: Setup Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Foundry tests
+        run: forge test -vvv
+
+      - name: Install Slither
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+          pip3 install slither-analyzer
+
+      - name: Run Slither static analysis
+        run: slither .
